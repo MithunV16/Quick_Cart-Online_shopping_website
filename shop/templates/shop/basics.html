@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <!-- new link in boorstrap5 replacing the below old jquery script link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+
+
+    <title>{% block title %} {% endblock %}</title>
+    {% block css1 %} {% endblock %}
+</head>
+
+<body>
+
+    <div id="fb-root"></div>
+    <!-- script for facebook plugin-->
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v12.0"
+        nonce="xuiu1WLy"></script>
+
+
+    <!--checking the login status-->
+    {% if user.is_authenticated %}
+    <input type="hidden" value=1 id="login_status">
+    {% else %}
+    <input type="hidden" value=0 id="login_status">
+    {% endif %}
+
+
+    <!-- nav bar starts here-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top" style="padding: 3px;">
+        <!-- #logo and brand Name -->
+        <div style="display: flex;">
+            <a href="/" style="display: flex;">
+                <img src="https://img.icons8.com/nolan/64/fast-cart.png" />
+                <span class="navbar-brand mt-2" style="margin-right:0px;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif, serif;
+                font-size: x-large;"><strong>Quick Cart</strong>
+                </span>
+            </a>
+
+        </div>
+
+
+        <div class="collapse navbar-collapse ml-3" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/tracker">Tracker</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">Contact Us</a>
+                </li>
+            </ul>
+
+            <form action="/search/" class="form-inline my-2 my-lg-0" method="post">{% csrf_token %}
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"
+                    name="search">
+                <!-- <button class="btn btn-outline-success my-2 my-sm-0" type="">Search</button> -->
+            </form>
+
+
+
+            <!--Buttons to Trigger Login and Signup page-->
+
+            <!--After logged in-->
+            {% if user.is_authenticated %}
+            <!-- this forms sends the current url, so that when a user logout he stays in the same page -->
+            <form action="/logout/" method="post">
+                {% csrf_token %}
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle mb-1" type="button" id="dropdownMenuButton1"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Signed In as {{request.user}}
+                    </button>
+                    <ul class="dropdown-menu" style="background-color: rgb(218, 218, 218);"
+                        aria-labelledby="dropdownMenuButton1">
+                        <li>
+                            <button class="dropdown-item" style="cursor: pointer;" type="submit">Logout</button>
+                        </li>
+                    </ul>
+                    <input type="hidden" value="{{request.path}}" name="currentPath" id="currentPath">
+                </div>
+            </form>
+
+
+            {% else %}
+
+            <!-- before logging in-->
+
+            <button type="button" class="btn btn-success mr-2 mb-2" data-toggle="modal" data-target="#loginModal">
+                <!--Here id is targeted-->
+                Login
+            </button>
+
+            <button type="button" class="btn btn-success mr-2 mb-2" data-toggle="modal" data-target="#signupModal">
+                SignUp
+            </button>
+            {% endif %}
+
+
+
+        </div>
+
+        <div class="mt-1 ml-3" style="display: flex;">
+            <!--Cart count button-->
+            <div>
+                <form action="/checkout">
+                    <button id="popcart" type="submit" class="btn btn-primary mr-2 mb-2"
+                        style="display: flex;font-size: smaller;padding-left: 6px;">Cart
+                        <span class="badge bg-danger ml-1 mt-1">
+                            <span id="cartValue">0</span>
+                        </span>
+                    </button>
+                </form>
+            </div>
+
+            <!--Hamburger icon ,only visible in mobile view-->
+            <div>
+                <button class="navbar-toggler" type="button" data-toggle="collapse"
+                    data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Displays Message below the Navbar-->
+
+    <!--Message bar to show the messages using Js-->
+    <div class="alert alert-warning alert-dismissible" style="display: none;" id='message_bar'></div>
+
+    <!--Message bar to show the messages using django-->
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{message.tags}} alert-dismissible">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <strong>Message : </strong> {{message}}
+    </div>
+
+    {% endfor %}
+    {% endif %}
+
+
+
+
+    <!-- SignUp Modal -->
+    <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="signupModalTitle">SignUp Here</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/signup/" method='post'>{% csrf_token %}
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" id="username" name="username"
+                                placeholder="Choose a unique username">
+                        </div>
+                        <div class="form-group">
+                            <label for="fname">First Name</label>
+                            <input type="text" class="form-control" id="fname" name="fname"
+                                placeholder="Enter Your First Name">
+                        </div>
+                        <div class="form-group">
+                            <label for="lname">Last Name</label>
+                            <input type="text" class="form-control" id="lname" name="lname"
+                                placeholder="Enter Your Last Name">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email address</label>
+                            <input type="email" class="form-control" id="singin_email" name="email"
+                                placeholder="name@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="pass1">Choose a password</label>
+                            <input type="password" class="form-control" id="pass1" name="pass1"
+                                placeholder="Choose Your Password">
+                        </div>
+                        <div class="form-group">
+                            <label for="pass2">Confirm Password</label>
+                            <input type="password" class="form-control" id="pass2" name="pass2"
+                                placeholder="Enter your password again">
+                        </div>
+                        <input type="hidden" name="currentPathsignIn" id="currentPathsignIn" value="{{request.path}}">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+                <div class="modal-footer"></div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalTitle">Login Here</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/login/" method="post">{% csrf_token %}
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" id="loginusername" name="loginusername"
+                                placeholder="Choose a unique username">
+                        </div>
+                        <div class="form-group">
+                            <label for="pass">Enter your password </label>
+                            <input type="password" class="form-control" id="loginpass" name="loginpass"
+                                placeholder="Enter your password ">
+                        </div>
+                        <input type="hidden" name="currentPathlogIn" id="currentPathlogIn" value="{{request.path}}">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+                <div class="modal-footer"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- #extracting the cart data obtained from django -->
+    {% if user.is_authenticated %}
+
+    <!-- cant use type="hidden" for textarea
+         -->
+    <textarea id="cart_data" style="display: none;">{{cart.json_data}}</textarea>
+    <input id="cart_length" type="hidden" value={{cart_length}}>
+
+    {% else %}
+
+    <input type="hidden" value="" id="cart_data">
+    <input type="hidden" value=0 id="cart_length">
+
+    {% endif %}
+
+
+    {% block body %} {% endblock %}
+
+
+
+    <script>
+        //return the sum of number of products added to the cart
+        function productSum() {
+            let sum = 0;
+            a = Object.values(JSON.parse(localStorage.getItem('cart')));
+            a.forEach(element => {
+                sum += Number(element[0]);
+            });
+            return sum;
+        }
+
+        //update the localStorage and cart item count
+        function refresh() {
+            localStorage.setItem('cart', JSON.stringify(cartArr));
+            document.getElementById('cartValue').innerHTML = productSum();
+        }
+
+
+        //checks the login status
+        function check_login_status() {
+            var login_status = document.getElementById('login_status');
+            if (login_status.value == 1) {
+                return true;
+            }
+            
+            else {
+                message_bar = document.getElementById('message_bar');
+                message_bar.innerHTML = `<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                    <strong>Message : </strong>Please Login to add items to cart`;
+                message_bar.style.display = "block";
+                setTimeout(() => {
+                    message_bar.style.display = "none";
+                    message_bar.innerHTML = "";
+                }, 3000);
+                return false;
+            }
+        }
+
+
+        //function for add button
+        function addProd() {
+            let addProduct = document.querySelectorAll('.cartAdd');
+            addProduct.forEach((element) => {
+                element.addEventListener('click', (e) => {
+                    let productid = e.target.getAttribute('id');
+                    productid = productid.slice(3);
+                    cartArr[productid][0] += 1;
+                    e.target.previousSibling.innerHTML = cartArr[productid][0];
+                    refresh();
+                    update_cart_ajax();
+                });
+            });
+        }
+
+        //function for substraction button
+        function subProd() {
+            let subProduct = document.querySelectorAll('.cartSub');
+            subProduct.forEach((element) => {
+                element.addEventListener('click', (e) => {
+                    let productid = e.target.getAttribute('id');
+                    if (cartArr[productid][0] == 1) {
+                        a = document.getElementById(productid).parentElement;
+                        a.innerHTML = `<div id="` + productid + `" class="btn btn-primary cart">Add to cart</div>`;
+                        delete cartArr[productid];
+                        refresh();
+                        addToCart();
+                    }
+                    else {
+                        cartArr[productid][0] -= 1;
+                        e.target.nextSibling.innerHTML = cartArr[productid][0];
+                        refresh();
+                    }
+                    update_cart_ajax();
+                });
+            });
+        }
+
+
+        //fires when clicked on Add to cart
+        function addToCart() {
+            var cartClass = document.querySelectorAll(".cart");
+            cartClass.forEach((ele) => {
+                ele.addEventListener('click', (e) => {
+                    if (check_login_status()) {
+                        let cartId = (e.target.getAttribute('id'));
+                        cartArr[cartId] = {};
+                        cartArr[cartId][0] = 1;
+                        cartArr[cartId][1] = document.getElementById("productName" + cartId.slice(7)).innerText;
+                        cartArr[cartId][2] = (document.getElementById("productPrice" + cartId.slice(7)).innerText).slice(2);
+                        refresh();
+                        updateButton();
+                        addProd();
+                        subProd();
+                        update_cart_ajax();
+                    }
+
+                });
+            });
+        }
+
+
+        // to update the user cart asynchronously
+        function update_cart_ajax() {
+            const url = "/updateCart/";
+            fetch(url, {
+                method: "POST",
+                body: JSON.stringify(cartArr),
+                header: { "Content-type": "application/json charset=UTF-8" },
+            }).then((response) => {
+                return response.text();
+            }).then((text) => { })
+        };
+
+        addToCart();
+
+        // getting the cart data obtained through django using hidden input tags
+        var cart_data = document.getElementById('cart_data').value;
+        var cart_length = document.getElementById('cart_length').value;
+
+        if (cart_data == "" || cart_data == 0 || cart_length == 0) {
+            var cartArr = {}
+        }
+        else {
+            var cartArr = JSON.parse(cart_data);
+        }
+        refresh();
+        addProd();
+        subProd();
+    </script>
+
+
+    {% block js %} {% endblock %}
+
+</body>
+
+</html>

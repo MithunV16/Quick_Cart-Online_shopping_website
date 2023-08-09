@@ -1,0 +1,175 @@
+{% extends 'shop/basics.html' %}
+{% block title%} My Awesome Cart Tracker{% endblock %}
+{% block body %}
+{% load extra %}
+{% load humanize %}
+
+
+<div class="accordion" id="accordionExample">
+    {% for order in orders_list reversed %}
+    <div class="accordion-item">
+        <h4 class="accordion-header mb-0" id="heading{{forloop.counter}}">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapse{{forloop.counter}}" aria-expanded="true"
+                aria-controls="collapse{{forloop.counter}}" style="height: 8vh;">
+                <span>Order Id: {{order.0.order_id}}</span>
+                <pre>   </pre>
+                <span>Name: {{order.0.name|slice_str}}</span>
+            </button>
+        </h4>
+        <div id="collapse{{forloop.counter}}" class="accordion-collapse collapse"
+            aria-labelledby="heading{{forloop.counter}}" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <ul class="list-group" style="cursor: pointer;">
+                    <li class="list-group-item" data-toggle="modal" data-target="#order_summary{{forloop.counter}}">
+                        Order Summary</li>
+                    <li class="list-group-item" data-toggle="modal" data-target="#shipping_details{{forloop.counter}}">
+                        Shipping Details</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- order summary modal -->
+<div class="modal fade" id="order_summary{{forloop.counter}}" tabindex="-1"
+    aria-labelledby="order_summary{{forloop.counter}}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalTitle{{forloop.counter}}">Order Summary</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal_body{{forloop.counter}}">
+                <!-- taking the cart data json from and parsing it using Js -->
+                <textarea style="display:none;" name="order_data{{forloop.counter}}" class="order_data"
+                    id="order_data{{forloop.counter}}" cols="30" rows="10">
+                    {{order.0.productJson}}
+                </textarea>
+
+                <div class="container_box">
+                    <div class="container_header row border border-primary align-items-center bg-info"
+                        style="height: 50px;border-width:2px !important;">
+                        <div class="col-4">
+                            <h5>Product</h5>
+                        </div>
+                        <div class="col-4">
+                            <h5>Price X Count </h5>
+                        </div>
+                        <div class="col-4">
+                            <div class="badge bg-warning"
+                                style="float:right;font-size: medium;width: 110px;color: black;">Total
+                                Price</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- shipping details modal -->
+<div class="modal fade" id="shipping_details{{forloop.counter}}" tabindex="-1"
+    aria-labelledby="shipping_details{{forloop.counter}}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalTitle{{forloop.counter}}">Shipping Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="font-size:16px;">
+                <div class="list-group">
+                    {% for status in order.1 reversed %}
+                    <a href="#" class="list-group-item list-group-item-action" aria-current="true">
+                        <div class="d-flex w-100 justify-content-between">
+                            <div class="mb-1"><strong>{{status.desc}}</strong></div>
+                            <div style="color: black;">
+                                <span class="badge bg-warning" style="color: black;">
+                                    <strong>{{status.date|naturaltime}}</strong>
+                                </span>
+                            </div>
+
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+{% endfor %}
+
+{% endblock %}
+
+{% block css1 %}
+
+<style>
+    .accordion-item {
+        width: 60vw;
+        margin: 5vh auto 0 auto;
+    }
+
+    .accordion-button {
+        width: 100%;
+    }
+
+    .list-group-item {
+        border: solid black 2px;
+    }
+
+    @media (max-width:800px) {
+        .accordion-item {
+            width: 90vw;
+        }
+
+        .modal {
+            font-size: small;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block js %}
+<script>
+    const order_data = document.querySelectorAll(".order_data");
+    order_data.forEach((element) => {
+        // let id=element.getAttribute("id");
+        let json_data = JSON.parse(element.innerHTML);
+        next_element = element.nextElementSibling;
+        temp = next_element.innerHTML;
+        for (const key in json_data) {
+            dict_value = json_data[key];
+            temp += `
+                    <div class="border-top-0">
+                        <div class="row align-items-center border" style="height: 50px;">
+                            <div class="col-4">`+ dict_value["1"] + `</div>
+                            <div class="col-4">
+                                <p>`+ dict_value["2"] + ` X ` + dict_value["0"] + `</p>
+                            </div>
+                            <div class="col-4">
+                                <div class="badge bg-warning" style="float:right;width: 110px;color:black;"><h6>`+ dict_value["0"] * dict_value["2"] + `</h6></div>
+                            </div>
+                        </div>
+                    </div> `
+        };
+        next_element.innerHTML = temp;
+
+    });
+
+
+    // let collapsable=document.querySelector('.accordion-collapse collapse show');
+    // print(collapsable)
+
+</script>
+{% endblock %}

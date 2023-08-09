@@ -1,0 +1,46 @@
+{% extends 'shop/basics.html' %}
+
+{% block title %} title of about {% endblock %}
+
+{% block body %}
+
+<div id="formContainer" class="mt-5 mx-auto">
+    <form action="/contact/" method="post">{% csrf_token %}
+        <div class="mb-3">
+            <label for="name" class="form-label"></label>
+            <input type="text" class="form-control" id="name" name="name" aria-describedby="emailHelp"
+                placeholder="Enter your name">
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label"></label>
+            <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp"
+                placeholder="Enter your Email">
+        </div>
+        <div class="mb-5">
+            <label for="phoneNumber" class="form-label"></label>
+            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
+                placeholder="Enter your Phone number">
+        </div>
+        <div class="form-floating mb-5">
+            <label for="desc" class="form-label"></label>
+            <textarea class="form-control" placeholder="Leave a comment here" id="desc" name="desc" style="height: 100px"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+{% block css1 %}
+<style>
+    #formContainer {
+        width: 50vw;
+    }
+
+    @media (max-width:800px) {
+        #formContainer {
+            width: 80vw;
+        }
+    }
+</style>
+
+{% endblock %}
+{% endblock %}

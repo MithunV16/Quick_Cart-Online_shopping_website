@@ -1,0 +1,166 @@
+{% extends 'shop/basics.html' %}
+{% block title %} Home {% endblock %}
+{% block css1 %}
+<style>
+    .col-md-3 {
+        display: inline-block;
+        margin-left: -4px;
+    }
+
+    .carousel-indicators .active {
+        background-color: blue;
+    }
+
+    .col-md-3 img {
+        height: 20vh;
+        width: auto;
+        margin: auto;
+
+    }
+
+    body .carousel-indicator li {
+        background-color: blue;
+    }
+
+    body .carousel-indicators {
+        bottom: 0;
+    }
+
+    body .carousel-control-prev-icon,
+    body .carousel-control-next-icon {
+        background-color: blue;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        top: auto;
+        bottom: auto;
+        margin-top: 150px;
+    }
+
+    body .no-padding {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    @media (max-width:800px) {
+        #qwert {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<!--For laptop view-->
+
+{% if not Mobile %}
+<div class="container">
+    {% for products,range,nslides in allProds %}
+    <h3 class="my-3">Recomonded Products in {{products.0.category}}</h3>
+    <div class="row">
+        <div id="demo{{forloop.counter}}" class="col carousel slide my-3" data-ride="carousel">
+
+
+            <!-- Slideshow starts here -->
+            <div class="productBox carousel-inner no-padding">
+
+                <div class="carousel-item active">
+
+                    {% for i in products %}
+                    <div class="col-xs-3 col-sm-3 col-md-3">
+                        <div class="card align-items-center" style="width: 18rem;">
+                            <img src='/media/{{i.image}}' class="card-img-top mt-2" alt="...">
+                            <div class="card-body">
+                                <h5 id="productName{{i.id}}" class="card-title">{{i.product_name}}</h5>
+                                <p id="productPrice{{i.id}}" class="card-text"><strong>₹ {{i.price}}</strong></p>
+                                <span id='button{{i.id}}'>
+                                    <div id='product{{i.id}}' class="btn btn-primary cart">Add to cart</div>
+                                </span>
+                                <a href="/productView/{{i.id}}" id="quickView{{i.id}}"
+                                    class="btn btn-primary ml-3">Quick view</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% if forloop.counter|divisibleby:4 and forloop.counter > 0 and not forloop.last %}
+                </div>
+                <div class="carousel-item">
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- left and right controls for the slide -->
+        <a class="carousel-control-prev" href="#demo{{forloop.counter}}" data-slide="prev">
+            <img src="https://img.icons8.com/external-those-icons-fill-those-icons/24/000000/
+                external-left-arrows-those-icons-fill-those-icons-3.png" />
+        </a>
+        <a class="carousel-control-next" href="#demo{{forloop.counter}}" data-slide="next">
+            <img src="https://img.icons8.com/external-those-icons-fill-those-icons/24/000000/
+            external-right-arrows-those-icons-fill-those-icons-5.png" />
+        </a>
+
+    </div>
+    {% endfor %}
+
+    {% endif %}
+</div>
+
+
+<!--for mobile view-->
+
+{% if Mobile %}
+<div class="container">
+    {% for products,range,nslides in allProds %}
+    <h3 class="mt-5" style="text-align: center;">Recomonded Products in {{products.0.category}}</h3>
+    {% for i in products %}
+    <div class="row">
+        <div class="col-xl-3 col-sm-3 col-md-3 mt-2 mb-1">
+            <div class="card align-items-center shadow" style="width: 18rem;margin: auto;">
+                <img src='/media/{{i.image}}' class="card-img-top mt-2" alt="...">
+                <div class="card-body">
+                    <h5 id="productName{{i.id}}" class="card-title">{{i.product_name}}</h5>
+                    <p id="productPrice{{i.id}}" class="card-text">₹ {{i.price}}</p>
+                    <span id='button{{i.id}}'>
+                        <div id='product{{i.id}}' class="btn btn-primary cart">Add to cart</div>
+                    </span>
+                    <a href="/productView/{{i.id}}" id="quickView{{i.id}}" class="btn btn-primary ml-3">Quick
+                        view</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+
+
+{% block js %}
+<script>
+    //updates the button if item is there in cart
+    function updateButton() {
+        let cartArr1 = Object.keys(JSON.parse(localStorage.getItem('cart')));
+        cartArr1.forEach((element) => {
+            try {
+                document.getElementById(element).parentElement.innerHTML = `<div id="product` + element.slice(7) +
+                    `" class="btn btn-primary mr-2 cartSub">-</div>` + `<span>` + cartArr[element][0] + `</span>` +
+                    `<div id="addproduct` + element.slice(7) + `" class="btn btn-primary ml-2 cartAdd">+</div>`;
+            }
+            catch (e) { }
+
+        });
+
+    }
+    updateButton();
+    addProd();
+    subProd();
+</script>
+
+{% endblock %}
